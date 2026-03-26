@@ -1,0 +1,17 @@
+$$ PokémonLang Test Program
+$$ Prints "hello world" and counts from 1 to 10
+
+Move EmptyBall StartBattle fob fcb OpenBall
+    $$ Print hello world
+    pikapika fob "hello world" fcb dot
+
+    $$ Declare counter variable
+    Pikachu i evo 1 dot
+
+    $$ Count from 1 to 10 and print each number
+    AshTrain fob i evo 1 dot i <= 10 dot i evo i atk 1 fcb OpenBall
+        pikapika fob i fcb dot
+    CloseBall
+
+    back 0 dot
+CloseBall

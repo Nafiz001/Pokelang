@@ -1,0 +1,158 @@
+$$ Comprehensive PokémonLang Test
+$$ Tests all major language features
+
+$* 
+   Function to calculate power
+   Returns base ^ exponent
+*$
+Move Pikachu calculatePower fob Pikachu base , Pikachu exp fcb OpenBall
+    Pikachu result evo 1 dot
+    Pikachu i evo 0 dot
+    
+    WildBattle fob i < exp fcb OpenBall
+        result evo result x base dot
+        i evo i atk 1 dot
+    CloseBall
+    
+    back result dot
+CloseBall
+
+$$ Function to check even/odd
+Move Togepi isEven fob Pikachu num fcb OpenBall
+    Brock fob num mod 2 == 0 fcb OpenBall
+        back 1 dot
+    CloseBall Jessie OpenBall
+        back 0 dot
+    CloseBall
+CloseBall
+
+$$ Main program
+Move EmptyBall StartBattle fob fcb OpenBall
+    $$ Variable declarations with different types
+    Pikachu playerHealth evo 100 dot
+    Pikachu maxHealth evo 150 dot
+    Charizard damageMultiplier evo 1.5 dot
+    Mewtwo preciseValue evo 3.14159 dot
+    Eevee grade evo 'A' dot
+    Togepi isAlive evo 1 dot
+    Togepi hasPower evo 0 dot
+    
+    $$ Array declaration
+    Pikachu scores[5] dot
+    scores[0] evo 100 dot
+    scores[1] evo 95 dot
+    scores[2] evo 88 dot
+    
+    $$ If-Else-If chain
+    Brock fob playerHealth > 80 crit isAlive == 1 fcb OpenBall
+        pikapika fob "Excellent health!" fcb dot
+        hasPower evo 1 dot
+    CloseBall Misty fob playerHealth >= 50 fcb OpenBall
+        pikapika fob "Moderate health" fcb dot
+    CloseBall Jessie OpenBall
+        pikapika fob "Critical condition!" fcb dot
+        hasPower evo 0 dot
+    CloseBall
+    
+    $$ For loop
+    Pikachu sum evo 0 dot
+    Pikachu j evo 0 dot
+    AshTrain fob j evo 0 dot j < 10 dot j evo j atk 1 fcb OpenBall
+        sum evo sum atk j dot
+        
+        $$ Nested if with continue
+        Brock fob j mod 2 == 0 fcb OpenBall
+            KeepFighting dot
+        CloseBall
+        
+        pikapika fob "Odd number" fcb dot
+    CloseBall
+    
+    $$ While loop with break
+    Pikachu health evo 100 dot
+    WildBattle fob health > 0 fcb OpenBall
+        health evo health dmg 15 dot
+        
+        Brock fob health <= 20 fcb OpenBall
+            pikapika fob "Health too low, escaping!" fcb dot
+            RunAway dot
+        CloseBall
+    CloseBall
+    
+    $$ Do-While loop
+    Pikachu attempts evo 0 dot
+    RetryBattle OpenBall
+        attempts evo attempts atk 1 dot
+        pikapika fob "Attempting..." fcb dot
+    CloseBall WildBattle fob attempts < 3 fcb dot
+    
+    $$ Switch statement
+    Pikachu choice evo 2 dot
+    HandleGym fob choice fcb OpenBall
+        TypeBadge 1 dot
+            pikapika fob "Option 1 selected" fcb dot
+            RunAway dot
+            
+        TypeBadge 2 dot
+            pikapika fob "Option 2 selected" fcb dot
+            RunAway dot
+            
+        TypeBadge 3 dot
+            pikapika fob "Option 3 selected" fcb dot
+            RunAway dot
+            
+        DefaultBadge dot
+            pikapika fob "Invalid option" fcb dot
+    CloseBall
+    
+    $$ Math operations
+    Pikachu damage evo 25 x 3 dot
+    Charizard average evo damage hp 3.0 dot
+    Pikachu remaining evo playerHealth dmg damage dot
+    Pikachu bonus evo damage mod 10 dot
+    
+    $$ Logical operations
+    Togepi canFight evo isAlive crit hasPower dot
+    Togepi needsRest evo fob health < 30 team playerHealth < 50 fcb dot
+    Togepi isHealthy evo confuse needsRest dot
+    
+    $$ Relational operations
+    Togepi isStrong evo playerHealth > 75 dot
+    Togepi isWeak evo playerHealth <= 25 dot
+    Togepi isEqual evo playerHealth == maxHealth dot
+    Togepi isDifferent evo health != 100 dot
+    
+    $$ Math function calls
+    Charizard sqrtResult evo rootchu fob 16.0 fcb dot
+    Charizard powerResult evo powerup fob 2.0 , 3.0 fcb dot
+    Pikachu absResult evo heal fob dmg 42 fcb dot
+    Charizard floorResult evo floorchu fob 4.7 fcb dot
+    Charizard ceilResult evo ceilchu fob 4.2 fcb dot
+    
+    $$ Trigonometric functions
+    Charizard angle evo 45.0 dot
+    Charizard sinVal evo sinchu fob angle fcb dot
+    Charizard cosVal evo coschu fob angle fcb dot
+    Charizard tanVal evo tanchu fob angle fcb dot
+    
+    $$ Function calls
+    Pikachu power evo calculatePower fob 2 , 8 fcb dot
+    Togepi evenCheck evo isEven fob 42 fcb dot
+    
+    $$ Complex expressions
+    Pikachu complexCalc evo fob fob 10 atk 5 fcb x 2 fcb dmg 3 dot
+    Charizard formula evo fob playerHealth x damageMultiplier fcb hp 2.0 dot
+    
+    $$ Nested conditions
+    Brock fob isAlive == 1 fcb OpenBall
+        Brock fob health > 50 fcb OpenBall
+            pikapika fob "Strong and alive!" fcb dot
+        CloseBall Jessie OpenBall
+            pikapika fob "Alive but weak" fcb dot
+        CloseBall
+    CloseBall
+    
+    $$ Return statement
+    pikapika fob "Program completed successfully!" fcb dot
+    back 0 dot
+CloseBall

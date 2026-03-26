@@ -1,0 +1,31 @@
+$$ Simple PokémonLang Program
+$$ Calculate and display health status
+
+Move EmptyBall StartBattle fob fcb OpenBall
+    $$ Variable declarations
+    Pikachu health evo 100 dot
+    Pikachu maxHealth evo 150 dot
+    Charizard percentage evo 66.7 dot
+    Togepi isHealthy evo 1 dot
+    
+    $$ Check health status
+    Brock fob health > 80 fcb OpenBall
+        pikapika fob "Excellent health!" fcb dot
+    CloseBall Misty fob health >= 50 fcb OpenBall
+        pikapika fob "Good health" fcb dot
+    CloseBall Jessie OpenBall
+        pikapika fob "Critical!" fcb dot
+    CloseBall
+    
+    $$ Loop example
+    Pikachu counter evo 0 dot
+    WildBattle fob counter < 5 fcb OpenBall
+        counter evo counter atk 1 dot
+    CloseBall
+    
+    $$ Math operations
+    Pikachu damage evo 10 x 5 dot
+    Pikachu remaining evo health dmg damage dot
+    
+    back 0 dot
+CloseBall

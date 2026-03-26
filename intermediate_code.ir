@@ -1,0 +1,24 @@
+# PokemonLang Intermediate Representation
+# Source: .\simple_test.poke
+
+FUNC EmptyBall StartBattle(0)
+ENTER StartBattle
+DECL Pikachu health
+health = 100.000000
+DECL Pikachu maxHealth
+maxHealth = 150.000000
+DECL Charizard percentage
+percentage = 66.700000
+DECL Togepi isHealthy
+isHealthy = 1.000000
+PRINT Excellent health!
+PRINT Good health
+PRINT Critical!
+DECL Pikachu counter
+counter = 0.000000
+counter = 1.000000
+DECL Pikachu damage
+damage = 50.000000
+DECL Pikachu remaining
+remaining = 50.000000
+LEAVE StartBattle
