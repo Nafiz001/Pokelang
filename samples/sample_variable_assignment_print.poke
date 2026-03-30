@@ -1,0 +1,15 @@
+Move EmptyBall StartBattle fob fcb OpenBall
+    Pikachu attack evo 25 dot
+    Pikachu bonus evo 10 dot
+    Charizard ratio evo 2.5 dot
+
+    Pikachu total evo attack atk bonus dot
+
+    Brock fob total == 35 fcb OpenBall
+        pikapika fob "Variable assignment and expression test passed" fcb dot
+    CloseBall Jessie OpenBall
+        pikapika fob "Variable assignment test failed" fcb dot
+    CloseBall
+
+    back 0 dot
+CloseBall

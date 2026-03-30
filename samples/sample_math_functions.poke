@@ -1,0 +1,14 @@
+Move EmptyBall StartBattle fob fcb OpenBall
+    Charizard rootVal evo rootchu fob 16.0 fcb dot
+    Charizard powVal evo powerup fob 2.0 , 3.0 fcb dot
+    Charizard floorVal evo floorchu fob 4.9 fcb dot
+    Charizard ceilVal evo ceilchu fob 4.1 fcb dot
+
+    Brock fob rootVal == 4 crit powVal == 8 fcb OpenBall
+        pikapika fob "Math function test passed" fcb dot
+    CloseBall Jessie OpenBall
+        pikapika fob "Math function test failed" fcb dot
+    CloseBall
+
+    back 0 dot
+CloseBall

@@ -1,0 +1,16 @@
+Move EmptyBall StartBattle fob fcb OpenBall
+    Pikachu a evo 10 dot
+    Pikachu b evo 5 dot
+
+    Pikachu r1 evo a atk b x 2 dot
+    Pikachu r2 evo fob a atk b fcb x 2 dot
+    Pikachu r3 evo r2 dmg 4 dot
+
+    Brock fob r1 == 20 crit r2 == 30 crit r3 == 26 fcb OpenBall
+        pikapika fob "Expression evaluation passed" fcb dot
+    CloseBall Jessie OpenBall
+        pikapika fob "Expression evaluation failed" fcb dot
+    CloseBall
+
+    back 0 dot
+CloseBall

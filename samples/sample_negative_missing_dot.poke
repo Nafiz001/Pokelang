@@ -1,0 +1,6 @@
+$$ Negative test sample: this file is intentionally invalid (missing dot)
+Move EmptyBall StartBattle fob fcb OpenBall
+    Pikachu a evo 10
+    pikapika fob "This should trigger syntax error" fcb dot
+    back 0 dot
+CloseBall

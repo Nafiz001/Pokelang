@@ -1,0 +1,13 @@
+Move EmptyBall StartBattle fob fcb OpenBall
+    Pikachu base evo 5 dot
+    Charizard ratio evo base dot
+    Mewtwo precise evo ratio atk 0.25 dot
+
+    Brock fob precise > 5 fcb OpenBall
+        pikapika fob "Type conversion scenario passed" fcb dot
+    CloseBall Jessie OpenBall
+        pikapika fob "Type conversion scenario failed" fcb dot
+    CloseBall
+
+    back 0 dot
+CloseBall

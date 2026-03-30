@@ -1,0 +1,20 @@
+# PokemonLang Intermediate Representation
+# Source: D:\VS\PokeLang\web\temp\check-57c5ec65-436c-4845-91cb-7d7a10437b81.poke
+
+FUNC Pikachu add(0)
+ENTER add
+DECL Pikachu a
+DECL Pikachu b
+LEAVE add
+FUNC EmptyBall StartBattle(0)
+ENTER StartBattle
+DECL Pikachu i
+i = 0.000000
+DECL Pikachu total
+total = 0.000000
+i = 1.000000
+i = 2.000000
+total = 0.000000
+PRINT Sum from 1 to 5 is correct
+PRINT Sum calculation failed
+LEAVE StartBattle

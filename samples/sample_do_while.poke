@@ -1,0 +1,15 @@
+Move EmptyBall StartBattle fob fcb OpenBall
+    Pikachu attempts evo 0 dot
+
+    RetryBattle OpenBall
+        attempts evo attempts atk 1 dot
+    CloseBall WildBattle fob attempts < 3 fcb dot
+
+    Brock fob attempts == 3 fcb OpenBall
+        pikapika fob "Do-while test passed" fcb dot
+    CloseBall Jessie OpenBall
+        pikapika fob "Do-while test failed" fcb dot
+    CloseBall
+
+    back 0 dot
+CloseBall

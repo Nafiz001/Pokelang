@@ -1,0 +1,26 @@
+Move EmptyBall StartBattle fob fcb OpenBall
+    Pikachu i evo 0 dot
+    Pikachu total evo 0 dot
+
+    WildBattle fob i < 10 fcb OpenBall
+        i evo i atk 1 dot
+
+        Brock fob i mod 2 == 0 fcb OpenBall
+            KeepFighting dot
+        CloseBall
+
+        total evo total atk i dot
+
+        Brock fob total > 20 fcb OpenBall
+            RunAway dot
+        CloseBall
+    CloseBall
+
+    Brock fob total > 20 fcb OpenBall
+        pikapika fob "While + break + continue passed" fcb dot
+    CloseBall Jessie OpenBall
+        pikapika fob "While control-flow failed" fcb dot
+    CloseBall
+
+    back 0 dot
+CloseBall

@@ -1,0 +1,18 @@
+Move EmptyBall StartBattle fob fcb OpenBall
+    Pikachu choice evo 2 dot
+
+    HandleGym fob choice fcb OpenBall
+        TypeBadge 1 dot
+            pikapika fob "Case 1" fcb dot
+            RunAway dot
+
+        TypeBadge 2 dot
+            pikapika fob "Case 2 selected" fcb dot
+            RunAway dot
+
+        DefaultBadge dot
+            pikapika fob "Default branch" fcb dot
+    CloseBall
+
+    back 0 dot
+CloseBall
