@@ -10,6 +10,18 @@ Current project state is focused on a clean run path for rubric demonstration.
 .\run_program.ps1 -InputFile .\simple_test.poke -Run
 ```
 
+## Localhost web studio
+
+```powershell
+node .\web\server.js
+```
+
+Then open:
+
+```text
+http://127.0.0.1:3001
+```
+
 ## Primary guide
 
 Use `RUN_CHECK_PRESENT_GUIDE.md` for:

@@ -11,21 +11,8 @@ int primechu(double n) {
     }
     return 1;
 }
-
-
-
  int main( ) {
-    
-    printf ( "hello world" ) ;
-
-    
-    int i = 1 ;
-
-    
-    for ( i = 1 ; i <= 10 ; i = i + 1 ) {
-        printf ( i ) ;
-    }
-
+    printf ( "Hello from PokemonLang Studio" ) ;
     return 0 ;
 }
 

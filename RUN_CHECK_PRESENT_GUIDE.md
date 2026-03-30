@@ -155,3 +155,62 @@ Get-Content .\intermediate_code.ir | Select-Object -First 20
 2. Confirm tool install: `gcc --version`, `flex --version`, `win_bison --version`
 3. Check `.poke` grammar tokens (`dot`, `fob`, `fcb`, `OpenBall`, `CloseBall`)
 4. Fix first reported error line, then run again
+
+## 11) Localhost coding site (write code and get output)
+
+Start from project root:
+
+```powershell
+node .\web\server.js
+```
+
+Open in browser:
+
+```text
+http://127.0.0.1:3001
+```
+
+How to use:
+
+1. Write PokemonLang code in the editor.
+2. Click `Run Code`.
+3. Output appears in the output panel.
+
+Notes:
+
+1. The site calls your local `run_program.ps1` pipeline.
+2. If code has syntax or semantic problems, error output is shown in the output panel.
+3. Stop the server anytime with `Ctrl + C` in the terminal where it is running.
+
+## 12) Ready sample codes (for class/demo)
+
+Sample files added in project:
+
+1. `samples/sample_hello.poke`
+2. `samples/sample_if_else.poke`
+3. `samples/sample_function_loop.poke`
+
+Run them with compiler checks:
+
+```powershell
+.\pokelang_compiler.exe .\samples\sample_hello.poke
+.\pokelang_compiler.exe .\samples\sample_if_else.poke
+.\pokelang_compiler.exe .\samples\sample_function_loop.poke
+```
+
+Run them with real runtime output:
+
+```powershell
+.\run_program.ps1 -InputFile .\samples\sample_hello.poke -Run
+.\run_program.ps1 -InputFile .\samples\sample_if_else.poke -Run
+.\run_program.ps1 -InputFile .\samples\sample_function_loop.poke -Run
+```
+
+Quick copy-paste sample (hello world):
+
+```pokelang
+Move EmptyBall StartBattle fob fcb OpenBall
+	pikapika fob "Hello from PokemonLang" fcb dot
+	back 0 dot
+CloseBall
+```

@@ -1,0 +1,4 @@
+Move EmptyBall StartBattle fob fcb OpenBall
+    pikapika fob "Hello from PokemonLang" fcb dot
+    back 0 dot
+CloseBall

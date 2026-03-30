@@ -1,0 +1,20 @@
+Move Pikachu add fob Pikachu a , Pikachu b fcb OpenBall
+    back a atk b dot
+CloseBall
+
+Move EmptyBall StartBattle fob fcb OpenBall
+    Pikachu i evo 0 dot
+    Pikachu total evo 0 dot
+
+    AshTrain fob i evo 1 dot i <= 5 dot i evo i atk 1 fcb OpenBall
+        total evo add fob total , i fcb dot
+    CloseBall
+
+    Brock fob total == 15 fcb OpenBall
+        pikapika fob "Sum from 1 to 5 is correct" fcb dot
+    CloseBall Jessie OpenBall
+        pikapika fob "Sum calculation failed" fcb dot
+    CloseBall
+
+    back 0 dot
+CloseBall
