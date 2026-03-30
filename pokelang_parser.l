@@ -11,6 +11,48 @@
 #include "pokelang.tab.h"
 
 int line_number = 1;
+extern int explain_trace_mode;
+extern int indentation_error_count;
+
+int brace_depth = 0;
+int at_line_start = 1;
+int current_indent = 0;
+
+void check_indentation_and_update(int tok, const char* token_name, const char* lexeme) {
+    if (at_line_start) {
+        /* Simple rule: inside blocks, non-CloseBall statements must be indented by at least 4 spaces per depth. */
+        if (brace_depth > 0 && tok != RBRACE) {
+            int required = brace_depth * 4;
+            if (current_indent < required) {
+                fprintf(
+                    stderr,
+                    "Indentation error at line %d: token %s ('%s') has indent %d, expected at least %d. Fix: add at least %d leading spaces before this statement.\n",
+                    line_number,
+                    token_name,
+                    lexeme,
+                    current_indent,
+                    required,
+                    required
+                );
+                indentation_error_count++;
+            }
+        }
+        at_line_start = 0;
+    }
+
+    if (tok == LBRACE) {
+        brace_depth++;
+    } else if (tok == RBRACE && brace_depth > 0) {
+        brace_depth--;
+    }
+}
+
+void trace_token(const char* token_name, const char* lexeme) {
+    if (!explain_trace_mode) return;
+    printf("[TRACE][TOKEN] line=%d token=%s lexeme='%s'\n", line_number, token_name, lexeme);
+}
+
+#define RETURN_TOKEN(tok) do { check_indentation_and_update(tok, #tok, yytext); trace_token(#tok, yytext); return tok; } while (0)
 %}
 
 %option noyywrap
@@ -35,97 +77,97 @@ NEWLINE         \n
                                 }
 
     /* ========== PREPROCESSOR DIRECTIVES ========== */
-"ProfessorOak"                  { return INCLUDE; }
-"PokeDefine"                    { return DEFINE; }
+"ProfessorOak"                  { RETURN_TOKEN(INCLUDE); }
+"PokeDefine"                    { RETURN_TOKEN(DEFINE); }
 
     /* ========== DATA TYPES ========== */
-"Pikachu"                       { return INT; }
-"Charizard"                     { return FLOAT; }
-"Mewtwo"                        { return DOUBLE; }
-"Snorlax"                       { return LONG; }
-"Eevee"                         { return CHAR; }
-"Togepi"                        { return BOOL; }
-"EmptyBall"                     { return VOID; }
+"Pikachu"                       { RETURN_TOKEN(INT); }
+"Charizard"                     { RETURN_TOKEN(FLOAT); }
+"Mewtwo"                        { RETURN_TOKEN(DOUBLE); }
+"Snorlax"                       { RETURN_TOKEN(LONG); }
+"Eevee"                         { RETURN_TOKEN(CHAR); }
+"Togepi"                        { RETURN_TOKEN(BOOL); }
+"EmptyBall"                     { RETURN_TOKEN(VOID); }
 
     /* ========== CONTROL FLOW STATEMENTS ========== */
-"Misty"                         { return ELSE_IF; }
-"Brock"                         { return IF; }
-"Jessie"                        { return ELSE; }
-"AshTrain"                      { return FOR; }
-"WildBattle"                    { return WHILE; }
-"RetryBattle"                   { return DO; }
-"HandleGym"                     { return SWITCH; }
-"TypeBadge"                     { return CASE; }
-"DefaultBadge"                  { return DEFAULT; }
+"Misty"                         { RETURN_TOKEN(ELSE_IF); }
+"Brock"                         { RETURN_TOKEN(IF); }
+"Jessie"                        { RETURN_TOKEN(ELSE); }
+"AshTrain"                      { RETURN_TOKEN(FOR); }
+"WildBattle"                    { RETURN_TOKEN(WHILE); }
+"RetryBattle"                   { RETURN_TOKEN(DO); }
+"HandleGym"                     { RETURN_TOKEN(SWITCH); }
+"TypeBadge"                     { RETURN_TOKEN(CASE); }
+"DefaultBadge"                  { RETURN_TOKEN(DEFAULT); }
 
     /* ========== JUMP STATEMENTS ========== */
-"RunAway"                       { return BREAK; }
-"KeepFighting"                  { return CONTINUE; }
-"back"                          { return RETURN; }
+"RunAway"                       { RETURN_TOKEN(BREAK); }
+"KeepFighting"                  { RETURN_TOKEN(CONTINUE); }
+"back"                          { RETURN_TOKEN(RETURN); }
 
     /* ========== INPUT/OUTPUT FUNCTIONS ========== */
-"pikapika"                      { return PRINT; }
-"pokecatch"                     { return SCAN; }
+"pikapika"                      { RETURN_TOKEN(PRINT); }
+"pokecatch"                     { RETURN_TOKEN(SCAN); }
 
     /* ========== MATHEMATICAL FUNCTIONS ========== */
-"powerup"                       { return POW; }
-"rootchu"                       { return SQRT; }
-"floorchu"                      { return FLOOR; }
-"ceilchu"                       { return CEIL; }
-"heal"                          { return ABS; }
-"sinchu"                        { return SIN; }
-"coschu"                        { return COS; }
-"tanchu"                        { return TAN; }
-"asinchu"                       { return ASIN; }
-"acoschu"                       { return ACOS; }
-"atanchu"                       { return ATAN; }
-"primechu"                      { return PRIME; }
+"powerup"                       { RETURN_TOKEN(POW); }
+"rootchu"                       { RETURN_TOKEN(SQRT); }
+"floorchu"                      { RETURN_TOKEN(FLOOR); }
+"ceilchu"                       { RETURN_TOKEN(CEIL); }
+"heal"                          { RETURN_TOKEN(ABS); }
+"sinchu"                        { RETURN_TOKEN(SIN); }
+"coschu"                        { RETURN_TOKEN(COS); }
+"tanchu"                        { RETURN_TOKEN(TAN); }
+"asinchu"                       { RETURN_TOKEN(ASIN); }
+"acoschu"                       { RETURN_TOKEN(ACOS); }
+"atanchu"                       { RETURN_TOKEN(ATAN); }
+"primechu"                      { RETURN_TOKEN(PRIME); }
 
     /* ========== SPECIAL FUNCTIONS ========== */
-"Move"                          { return FUNCTION; }
-"StartBattle"                   { return MAIN; }
+"Move"                          { RETURN_TOKEN(FUNCTION); }
+"StartBattle"                   { RETURN_TOKEN(MAIN); }
 
     /* ========== MULTI-CHARACTER OPERATORS (Before single-char) ========== */
-"<="                            { return LESS_EQUAL; }
-">="                            { return GREATER_EQUAL; }
-"=="                            { return EQUAL; }
-"!="                            { return NOT_EQUAL; }
+"<="                            { RETURN_TOKEN(LESS_EQUAL); }
+">="                            { RETURN_TOKEN(GREATER_EQUAL); }
+"=="                            { RETURN_TOKEN(EQUAL); }
+"!="                            { RETURN_TOKEN(NOT_EQUAL); }
 
     /* ========== KEYWORD OPERATORS ========== */
-"atk"                           { return PLUS; }
-"dmg"                           { return MINUS; }
-"crit"                          { return AND; }
-"team"                          { return OR; }
-"confuse"                       { return NOT; }
-"evo"                           { return ASSIGN; }
-"mod"                           { return MODULO; }
-"x"                             { return MULTIPLY; }
-"hp"                            { return DIVIDE; }
+"atk"                           { RETURN_TOKEN(PLUS); }
+"dmg"                           { RETURN_TOKEN(MINUS); }
+"crit"                          { RETURN_TOKEN(AND); }
+"team"                          { RETURN_TOKEN(OR); }
+"confuse"                       { RETURN_TOKEN(NOT); }
+"evo"                           { RETURN_TOKEN(ASSIGN); }
+"mod"                           { RETURN_TOKEN(MODULO); }
+"x"                             { RETURN_TOKEN(MULTIPLY); }
+"hp"                            { RETURN_TOKEN(DIVIDE); }
 
     /* ========== DELIMITERS ========== */
-"dot"                           { return SEMICOLON; }
-"fob"                           { return LPAREN; }
-"fcb"                           { return RPAREN; }
-"OpenBall"                      { return LBRACE; }
-"CloseBall"                     { return RBRACE; }
+"dot"                           { RETURN_TOKEN(SEMICOLON); }
+"fob"                           { RETURN_TOKEN(LPAREN); }
+"fcb"                           { RETURN_TOKEN(RPAREN); }
+"OpenBall"                      { RETURN_TOKEN(LBRACE); }
+"CloseBall"                     { RETURN_TOKEN(RBRACE); }
 
     /* ========== SINGLE CHARACTER OPERATORS & DELIMITERS ========== */
-"<"                             { return LESS_THAN; }
-">"                             { return GREATER_THAN; }
-"["                             { return LBRACKET; }
-"]"                             { return RBRACKET; }
-","                             { return COMMA; }
+"<"                             { RETURN_TOKEN(LESS_THAN); }
+">"                             { RETURN_TOKEN(GREATER_THAN); }
+"["                             { RETURN_TOKEN(LBRACKET); }
+"]"                             { RETURN_TOKEN(RBRACKET); }
+","                             { RETURN_TOKEN(COMMA); }
 
     /* ========== LITERALS ========== */
-{FLOAT}                         { yylval.floatval = atof(yytext); return FLOAT_LITERAL; }
-{INTEGER}                       { yylval.intval = atoi(yytext); return INTEGER_LITERAL; }
+{FLOAT}                         { yylval.floatval = atof(yytext); RETURN_TOKEN(FLOAT_LITERAL); }
+{INTEGER}                       { yylval.intval = atoi(yytext); RETURN_TOKEN(INTEGER_LITERAL); }
 
 \"([^\"\n\\]|\\.)*\"           { 
                                   /* String literal - remove quotes */
                                   yylval.strval = (char*)malloc(strlen(yytext) - 1);
                                   strncpy(yylval.strval, yytext + 1, strlen(yytext) - 2);
                                   yylval.strval[strlen(yytext) - 2] = '\0';
-                                  return STRING_LITERAL;
+                                                                    RETURN_TOKEN(STRING_LITERAL);
                                 }
 
 \"([^\"\n\\]|\\.)*              { 
@@ -148,7 +190,7 @@ NEWLINE         \n
                                   } else {
                                       yylval.charval = yytext[1];
                                   }
-                                  return CHAR_LITERAL;
+                                                                    RETURN_TOKEN(CHAR_LITERAL);
                                 }
 
 '([^'\n\\]|\\.)*                { 
@@ -158,12 +200,20 @@ NEWLINE         \n
     /* ========== IDENTIFIERS (Lower Priority) ========== */
 {IDENTIFIER}                    { 
                                   yylval.strval = strdup(yytext);
-                                  return IDENTIFIER;
+                                                                    RETURN_TOKEN(IDENTIFIER);
                                 }
 
     /* ========== WHITESPACE & NEWLINE ========== */
-{WHITESPACE}                    { /* Ignore whitespace */ }
-{NEWLINE}                       { line_number++; }
+{WHITESPACE}                    {
+                                  if (at_line_start) {
+                                      int i;
+                                      for (i = 0; yytext[i] != '\0'; ++i) {
+                                          if (yytext[i] == ' ') current_indent += 1;
+                                          else if (yytext[i] == '\t') current_indent += 4;
+                                      }
+                                  }
+                                }
+{NEWLINE}                       { line_number++; at_line_start = 1; current_indent = 0; }
 
     /* ========== ERROR HANDLING ========== */
 .                               { 

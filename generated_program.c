@@ -12,7 +12,16 @@ int primechu(double n) {
     return 1;
 }
  int main( ) {
-    printf ( "Hello from PokemonLang Studio" ) ;
+    int healthPoints = 72 ;
+
+    if ( healthPoints > 80 ) {
+        printf ( "Excellent health" ) ;
+    } else if ( healthPoints >= 50 ) {
+        printf ( "Moderate health" ) ;
+    } else {
+        printf ( "Critical health" ) ;
+    }
+
     return 0 ;
 }
 

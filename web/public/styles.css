@@ -75,6 +75,12 @@ button.run {
   margin-left: auto;
 }
 
+button.run.trace {
+  background: #2d6f7f;
+  border-color: #1f5260;
+  margin-left: 0;
+}
+
 button:disabled {
   opacity: 0.6;
   cursor: wait;
@@ -82,6 +88,12 @@ button:disabled {
 
 label {
   font-weight: 600;
+}
+
+.hint {
+  margin: 0 0 10px;
+  color: #4a5662;
+  font-size: 14px;
 }
 
 #editor {

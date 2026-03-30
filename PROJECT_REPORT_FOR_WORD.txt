@@ -1,0 +1,84 @@
+POKEMONLANG COMPILER PROJECT REPORT
+
+Title
+PokemonLang: Design and Implementation of a Domain-Specific Educational Programming Language Using Flex and Bison
+
+Objectives
+1. Design a custom programming language with Pokemon-themed keywords mapped to standard C concepts.
+2. Implement lexical analysis using Flex.
+3. Implement syntax analysis and semantic validation using Bison.
+4. Generate intermediate representation (IR) for explainability and compiler-stage visibility.
+5. Provide a simple web interface for writing, running, and tracing PokemonLang programs.
+6. Demonstrate practical compiler phases in a way suitable for academic presentation and viva.
+
+Introduction
+PokemonLang is an educational programming language project developed to demonstrate core compiler construction concepts in a practical and engaging way. The language replaces traditional C-style keywords with Pokemon-themed tokens while preserving structured programming capabilities such as variables, conditions, loops, functions, and return statements. The project combines lexical analysis, parsing, semantic checks, intermediate code generation, and runtime execution support. In addition to command-line workflow, a localhost web interface was developed so users can test programs quickly and observe outputs in a classroom-friendly environment.
+
+Methodology
+The project was implemented in phased steps:
+
+Phase 1: Language and token design
+- Defined the keyword mapping table from PokemonLang syntax to C-style semantics.
+- Finalized operator, datatype, control-flow, and function-related tokens.
+
+Phase 2: Lexical analysis (Flex)
+- Implemented tokenization rules in lexer files.
+- Added handling for identifiers, numeric values, symbols, and comments.
+- Ensured token output compatibility with parser requirements.
+
+Phase 3: Parsing and grammar (Bison)
+- Defined grammar rules for declarations, expressions, conditional blocks, loops, switch-case, and function structures.
+- Implemented parser actions to connect syntax with semantic logic.
+
+Phase 4: Semantic and analysis layer
+- Added semantic checks such as declaration validation, assignment compatibility, and function-level checks.
+- Integrated warnings and errors for clearer compiler feedback.
+- Added IR generation support for inspection of transformed program logic.
+
+Phase 5: Runtime and usability
+- Added runtime execution flow through transpilation to C and native compilation.
+- Built a localhost web interface with run and trace options.
+- Added sample programs and formatting aids to improve demo readiness.
+
+Exceptions (Project-Specific Special Features)
+This section describes notable advanced features beyond basic lexical and syntax parsing:
+
+1. Indentation-aware guidance
+- The compiler workflow includes indentation-awareness to encourage cleaner block structuring.
+- This helps students maintain readable nesting for OpenBall and CloseBall blocks.
+- It improves code clarity during teaching demonstrations.
+
+2. Web server-based execution environment
+- A local web server allows users to write and execute PokemonLang from the browser.
+- This adds accessibility for live class presentation without relying only on terminal commands.
+- Features include sample loading, run mode, and formatted output display.
+
+3. Trace and explainability mode
+- A dedicated trace mode shows step-wise compiler behavior.
+- The flow includes token stream visibility, parser reductions, semantic action logs, and IR line generation.
+- This is highly useful for viva defense and understanding internal compiler stages.
+
+Discussion
+The project successfully demonstrates the full educational compiler pipeline: lexical analysis, parsing, semantic processing, and execution support. The Pokemon-themed syntax makes concepts approachable while preserving formal compiler architecture. The addition of trace mode significantly improves transparency, making it easier to explain what happens internally at each stage. The web interface further improves usability by enabling fast testing and reducing setup friction for non-technical audiences. Overall, the project balances academic correctness and practical usability.
+
+Rubric Coverage
+1. Lexical Analysis: Completed
+- Token recognition for keywords, identifiers, literals, operators, delimiters, and comments is implemented using Flex.
+
+2. Syntax Analysis: Completed
+- Grammar rules for declarations, expressions, conditionals, loops, switch-case, and function constructs are implemented using Bison.
+
+3. Semantic Analysis: Completed
+- Type/declaration checks, assignment validation, and function-related semantic checks are integrated.
+
+4. Intermediate Representation (IR): Completed
+- IR output is generated to show compiler-stage transformation and internal logic flow.
+
+5. Runtime Demonstration: Completed
+- PokemonLang programs can be executed through transpilation to C and native compilation.
+
+6. Explainability and Presentation Readiness: Completed
+- Trace mode (token, reduce, semantic, IR), sample programs, and localhost web execution are available for demo/viva use.
+
+Conclusion
+PokemonLang achieved its core goals as a compiler course project. It provides a complete and demonstrable implementation of key compiler phases and presents them in an intuitive syntax model. The inclusion of indentation-awareness, web-based execution, and trace explainability makes the project stronger than a basic parser-only implementation. The final system is suitable for academic submission, classroom demonstration, and viva explanation.

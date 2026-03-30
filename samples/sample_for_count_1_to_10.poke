@@ -1,0 +1,14 @@
+Move EmptyBall StartBattle fob fcb OpenBall
+    Pikachu i evo 0 dot
+
+    AshTrain fob i evo 1 dot i <= 10 dot i evo i atk 1 fcb OpenBall
+    CloseBall
+
+    Brock fob i == 11 fcb OpenBall
+        pikapika fob "Counted 1 to 10 successfully" fcb dot
+    CloseBall Jessie OpenBall
+        pikapika fob "Count failed" fcb dot
+    CloseBall
+
+    back 0 dot
+CloseBall

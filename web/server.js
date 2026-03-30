@@ -99,6 +99,120 @@ function runProgram(code) {
   });
 }
 
+function runCompilerCheck(code) {
+  return new Promise((resolve) => {
+    const runId = randomUUID();
+    const sourcePath = path.join(TEMP_DIR, `check-${runId}.poke`);
+    const compilerExe = path.join(ROOT, "pokelang_compiler.exe");
+
+    fs.writeFileSync(sourcePath, code, "utf8");
+
+    if (!fs.existsSync(compilerExe)) {
+      try {
+        fs.unlinkSync(sourcePath);
+      } catch (_) {}
+      resolve({
+        ok: false,
+        output:
+          "Compiler check requires pokelang_compiler.exe. Build first with raw commands or build script.",
+      });
+      return;
+    }
+
+    const proc = spawn(compilerExe, [sourcePath], { cwd: ROOT });
+
+    let stdout = "";
+    let stderr = "";
+    let killedForTimeout = false;
+
+    const timeout = setTimeout(() => {
+      killedForTimeout = true;
+      proc.kill("SIGTERM");
+    }, 15000);
+
+    proc.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+
+    proc.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+
+    proc.on("close", (codeValue) => {
+      clearTimeout(timeout);
+
+      try {
+        fs.unlinkSync(sourcePath);
+      } catch (_) {}
+
+      if (killedForTimeout) {
+        resolve({ ok: false, output: "Compiler check timed out after 15 seconds." });
+        return;
+      }
+
+      const combined = [stdout.trim(), stderr.trim()].filter(Boolean).join("\n\n");
+      resolve({ ok: codeValue === 0, output: combined || "No compiler output." });
+    });
+  });
+}
+
+function runTrace(code) {
+  return new Promise((resolve) => {
+    const runId = randomUUID();
+    const sourcePath = path.join(TEMP_DIR, `trace-${runId}.poke`);
+    const compilerExe = path.join(ROOT, "pokelang_compiler.exe");
+
+    fs.writeFileSync(sourcePath, code, "utf8");
+
+    if (!fs.existsSync(compilerExe)) {
+      try {
+        fs.unlinkSync(sourcePath);
+      } catch (_) {}
+      resolve({
+        ok: false,
+        output:
+          "Trace mode requires pokelang_compiler.exe. Build first with raw commands or build script.",
+      });
+      return;
+    }
+
+    const proc = spawn(compilerExe, [sourcePath, "--trace"], { cwd: ROOT });
+
+    let stdout = "";
+    let stderr = "";
+    let killedForTimeout = false;
+
+    const timeout = setTimeout(() => {
+      killedForTimeout = true;
+      proc.kill("SIGTERM");
+    }, 15000);
+
+    proc.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+
+    proc.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+
+    proc.on("close", (codeValue) => {
+      clearTimeout(timeout);
+
+      try {
+        fs.unlinkSync(sourcePath);
+      } catch (_) {}
+
+      if (killedForTimeout) {
+        resolve({ ok: false, output: "Trace execution timed out after 15 seconds." });
+        return;
+      }
+
+      const combined = [stdout.trim(), stderr.trim()].filter(Boolean).join("\n\n");
+      resolve({ ok: codeValue === 0, output: combined || "No trace output." });
+    });
+  });
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
@@ -130,9 +244,22 @@ const server = http.createServer(async (req, res) => {
       try {
         const data = JSON.parse(body || "{}");
         const code = typeof data.code === "string" ? data.code : "";
+        const trace = data.trace === true;
 
         if (!code.trim()) {
           sendJson(res, 400, { ok: false, output: "Please enter PokemonLang code." });
+          return;
+        }
+
+        if (trace) {
+          const traceResult = await runTrace(code);
+          sendJson(res, traceResult.ok ? 200 : 400, traceResult);
+          return;
+        }
+
+        const checkResult = await runCompilerCheck(code);
+        if (!checkResult.ok) {
+          sendJson(res, 400, checkResult);
           return;
         }
 

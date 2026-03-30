@@ -20,6 +20,8 @@ void yyerror(const char* s);
 int syntax_error_count = 0;
 int semantic_error_count = 0;
 int semantic_warning_count = 0;
+int indentation_error_count = 0;
+int explain_trace_mode = 0;
 
 #define MAX_SYMBOLS 1024
 #define MAX_FUNCTIONS 256
@@ -79,6 +81,30 @@ FILE* ir_out = NULL;
 int collect_print_args = 0;
 char print_buffer[1024];
 
+void trace_event(const char* stage, const char* fmt, ...) {
+    va_list args;
+    if (!explain_trace_mode) return;
+    printf("[TRACE][%s] ", stage);
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+    printf("\n");
+}
+
+void trace_reduce(const char* rule) {
+    trace_event("REDUCE", "%s", rule);
+}
+
+void trace_semantic(const char* fmt, ...) {
+    va_list args;
+    if (!explain_trace_mode) return;
+    printf("[TRACE][SEM] ");
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+    printf("\n");
+}
+
 const char* dtype_name(DataType t) {
     switch (t) {
         case TYPE_INT: return "Pikachu";
@@ -95,11 +121,15 @@ const char* dtype_name(DataType t) {
 
 void emit_ir(const char* fmt, ...) {
     va_list args;
+    char line[512];
     if (!ir_out) return;
     va_start(args, fmt);
-    vfprintf(ir_out, fmt, args);
-    fprintf(ir_out, "\n");
+    vsnprintf(line, sizeof(line), fmt, args);
     va_end(args);
+    fprintf(ir_out, "%s\n", line);
+    if (explain_trace_mode) {
+        printf("[TRACE][IR] %s\n", line);
+    }
 }
 
 void semantic_error(const char* fmt, ...) {
@@ -196,6 +226,8 @@ int declare_symbol(const char* name, DataType type, int is_array) {
     symbols[idx].initialized = 0;
     symbols[idx].is_array = is_array;
 
+    trace_semantic("declare symbol name=%s type=%s array=%d", name, dtype_name(type), is_array);
+
     emit_ir("DECL %s %s", dtype_name(type), name);
     return idx;
 }
@@ -256,6 +288,8 @@ void assign_symbol(const char* name, ExprValue rhs) {
     symbols[idx].numeric_value = coerce_numeric(symbols[idx].type, rhs.num);
     symbols[idx].initialized = 1;
 
+    trace_semantic("assign %s <= %.6f (%s)", name, rhs.num, dtype_name(rhs.type));
+
     emit_ir("%s = %.6f", name, symbols[idx].numeric_value);
 }
 
@@ -284,6 +318,8 @@ void register_function(const char* name, DataType return_type, int param_count) 
     functions[idx].return_type = return_type;
     functions[idx].param_count = param_count;
 
+    trace_semantic("register function name=%s return=%s params=%d", name, dtype_name(return_type), param_count);
+
     emit_ir("FUNC %s %s(%d)", dtype_name(return_type), name, param_count);
 }
 
@@ -303,6 +339,8 @@ ExprValue evaluate_function_call(const char* name, int arg_count) {
         );
     }
 
+    trace_semantic("call function name=%s args=%d", name, arg_count);
+
     /* Placeholder runtime value for user-defined functions. */
     return make_number(0.0, functions[idx].return_type);
 }
@@ -311,10 +349,12 @@ void enter_function_context(const char* name, DataType return_type) {
     snprintf(current_function_name, sizeof(current_function_name), "%s", name);
     current_function_return_type = return_type;
     symbol_count = 0; /* Simplified per-function scope. */
+    trace_semantic("enter function context name=%s return=%s", name, dtype_name(return_type));
     emit_ir("ENTER %s", current_function_name);
 }
 
 void leave_function_context(void) {
+    trace_semantic("leave function context name=%s", current_function_name);
     emit_ir("LEAVE %s", current_function_name);
     snprintf(current_function_name, sizeof(current_function_name), "%s", "<global>");
     current_function_return_type = TYPE_VOID;
@@ -514,7 +554,7 @@ typedef struct {
 
 program:
     /* empty */
-    | declaration_list
+    | declaration_list { trace_reduce("program -> declaration_list"); }
     ;
 
 declaration_list:
@@ -523,9 +563,9 @@ declaration_list:
     ;
 
 declaration:
-    preprocessor_directive
-    | function_declaration
-    | variable_declaration SEMICOLON
+    preprocessor_directive { trace_reduce("declaration -> preprocessor_directive"); }
+    | function_declaration { trace_reduce("declaration -> function_declaration"); }
+    | variable_declaration SEMICOLON { trace_reduce("declaration -> variable_declaration SEMICOLON"); }
     ;
 
 preprocessor_directive:
@@ -627,7 +667,7 @@ type_specifier:
 
 /* Variable declarations */
 variable_declaration:
-    type_specifier declarator_list
+    type_specifier declarator_list { trace_reduce("variable_declaration -> type_specifier declarator_list"); }
     ;
 
 declarator_list:
@@ -666,12 +706,12 @@ statement_list:
     ;
 
 statement:
-    compound_statement
-    | expression_statement
-    | selection_statement
-    | iteration_statement
-    | jump_statement
-    | variable_declaration SEMICOLON
+    compound_statement { trace_reduce("statement -> compound_statement"); }
+    | expression_statement { trace_reduce("statement -> expression_statement"); }
+    | selection_statement { trace_reduce("statement -> selection_statement"); }
+    | iteration_statement { trace_reduce("statement -> iteration_statement"); }
+    | jump_statement { trace_reduce("statement -> jump_statement"); }
+    | variable_declaration SEMICOLON { trace_reduce("statement -> variable_declaration SEMICOLON"); }
     ;
 
 compound_statement:
@@ -687,29 +727,33 @@ expression_statement:
 selection_statement:
     IF LPAREN expression RPAREN compound_statement
     {
+        trace_reduce("selection_statement -> IF (...) compound_statement");
         if ($3.type == TYPE_STRING) {
             semantic_error("if condition cannot be string");
         }
     }
     | IF LPAREN expression RPAREN compound_statement ELSE_IF LPAREN expression RPAREN compound_statement
     {
+        trace_reduce("selection_statement -> IF ... ELSE_IF ...");
         if ($3.type == TYPE_STRING || $8.type == TYPE_STRING) {
             semantic_error("if/else-if condition cannot be string");
         }
     }
     | IF LPAREN expression RPAREN compound_statement ELSE_IF LPAREN expression RPAREN compound_statement ELSE compound_statement
     {
+        trace_reduce("selection_statement -> IF ... ELSE_IF ... ELSE ...");
         if ($3.type == TYPE_STRING || $8.type == TYPE_STRING) {
             semantic_error("if/else-if condition cannot be string");
         }
     }
     | IF LPAREN expression RPAREN compound_statement ELSE compound_statement
     {
+        trace_reduce("selection_statement -> IF ... ELSE ...");
         if ($3.type == TYPE_STRING) {
             semantic_error("if condition cannot be string");
         }
     }
-    | SWITCH LPAREN expression RPAREN LBRACE case_list RBRACE
+    | SWITCH LPAREN expression RPAREN LBRACE case_list RBRACE { trace_reduce("selection_statement -> SWITCH (...) { case_list }"); }
     ;
 
 case_list:
@@ -726,26 +770,30 @@ case_statement:
 iteration_statement:
     WHILE LPAREN expression RPAREN statement
     {
+        trace_reduce("iteration_statement -> WHILE (...) statement");
         if ($3.type == TYPE_STRING) {
             semantic_error("while condition cannot be string");
         }
     }
     | DO statement WHILE LPAREN expression RPAREN SEMICOLON
     {
+        trace_reduce("iteration_statement -> DO statement WHILE (...) ;");
         if ($5.type == TYPE_STRING) {
             semantic_error("do-while condition cannot be string");
         }
     }
-    | FOR LPAREN expression_statement expression_statement RPAREN statement
+    | FOR LPAREN expression_statement expression_statement RPAREN statement { trace_reduce("iteration_statement -> FOR (init;cond;) statement"); }
     | FOR LPAREN expression_statement expression_statement expression RPAREN statement
     {
+        trace_reduce("iteration_statement -> FOR (init;cond;update) statement");
         if ($5.type == TYPE_STRING) {
             semantic_error("for condition/update cannot be string where numeric expected");
         }
     }
-    | FOR LPAREN variable_declaration SEMICOLON expression_statement RPAREN statement
+    | FOR LPAREN variable_declaration SEMICOLON expression_statement RPAREN statement { trace_reduce("iteration_statement -> FOR (decl;cond;) statement"); }
     | FOR LPAREN variable_declaration SEMICOLON expression_statement expression RPAREN statement
     {
+        trace_reduce("iteration_statement -> FOR (decl;cond;update) statement");
         if ($6.type == TYPE_STRING) {
             semantic_error("for update cannot be string");
         }
@@ -754,10 +802,11 @@ iteration_statement:
 
 /* Jump statements */
 jump_statement:
-    BREAK SEMICOLON
-    | CONTINUE SEMICOLON
+    BREAK SEMICOLON { trace_reduce("jump_statement -> BREAK ;"); }
+    | CONTINUE SEMICOLON { trace_reduce("jump_statement -> CONTINUE ;"); }
     | RETURN SEMICOLON
     {
+        trace_reduce("jump_statement -> RETURN ;");
         if (current_function_return_type != TYPE_VOID) {
             semantic_error(
                 "function '%s' must return %s value",
@@ -768,6 +817,7 @@ jump_statement:
     }
     | RETURN expression SEMICOLON
     {
+        trace_reduce("jump_statement -> RETURN expression ;");
         if (current_function_return_type == TYPE_VOID) {
             if (!(is_numeric_type($2.type) && $2.num == 0.0)) {
                 semantic_error("void function '%s' cannot return a value", current_function_name);
@@ -790,9 +840,10 @@ expression:
     ;
 
 assignment_expression:
-    logical_or_expression { $$ = $1; }
+    logical_or_expression { $$ = $1; trace_reduce("assignment_expression -> logical_or_expression"); }
     | postfix_expression ASSIGN assignment_expression
     {
+        trace_reduce("assignment_expression -> postfix_expression ASSIGN assignment_expression");
         if (!$1.is_lvalue) {
             semantic_error("left side of assignment must be a variable");
             $$ = $3;
@@ -1089,10 +1140,17 @@ void yyerror(const char* s) {
 
 int main(int argc, char* argv[]) {
     int result;
+    int i;
 
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s <input.poke>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <input.poke> [--trace]\n", argv[0]);
         return 1;
+    }
+
+    for (i = 2; i < argc; ++i) {
+        if (strcmp(argv[i], "--trace") == 0 || strcmp(argv[i], "-t") == 0) {
+            explain_trace_mode = 1;
+        }
     }
 
     yyin = fopen(argv[1], "r");
@@ -1110,13 +1168,18 @@ int main(int argc, char* argv[]) {
     printf("=== PokemonLang Compiler ===\n");
     printf("Input file: %s\n", argv[1]);
     printf("Parsing + semantic analysis...\n\n");
+    if (explain_trace_mode) {
+        printf("[TRACE] Explainability mode enabled\n");
+        printf("[TRACE] Stages: token stream -> grammar reductions -> semantic actions -> IR lines\n\n");
+    }
 
     result = yyparse();
 
     printf("\n=== Compilation Result ===\n");
-    if (result == 0 && syntax_error_count == 0 && semantic_error_count == 0) {
+    if (result == 0 && syntax_error_count == 0 && semantic_error_count == 0 && indentation_error_count == 0) {
         printf("[SUCCESS] Parsing completed successfully.\n");
         printf("[SUCCESS] Semantic checks passed.\n");
+        printf("[SUCCESS] Indentation checks passed.\n");
         printf("[INFO] Semantic warnings: %d\n", semantic_warning_count);
         if (ir_out) {
             printf("[INFO] Intermediate code generated: intermediate_code.ir\n");
@@ -1125,11 +1188,16 @@ int main(int argc, char* argv[]) {
         printf("[FAILED] Compilation failed.\n");
         printf("[FAILED] Syntax errors: %d\n", syntax_error_count);
         printf("[FAILED] Semantic errors: %d\n", semantic_error_count);
+        printf("[FAILED] Indentation errors: %d\n", indentation_error_count);
         printf("[INFO] Semantic warnings: %d\n", semantic_warning_count);
     }
 
     if (yyin) fclose(yyin);
     if (ir_out) fclose(ir_out);
 
-    return (result == 0 && syntax_error_count == 0 && semantic_error_count == 0) ? 0 : 1;
+    if (explain_trace_mode) {
+        printf("[TRACE] Explainability run complete.\n");
+    }
+
+    return (result == 0 && syntax_error_count == 0 && semantic_error_count == 0 && indentation_error_count == 0) ? 0 : 1;
 }

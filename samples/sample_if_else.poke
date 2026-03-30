@@ -1,9 +1,9 @@
 Move EmptyBall StartBattle fob fcb OpenBall
-    Pikachu hp evo 72 dot
+    Pikachu healthPoints evo 72 dot
 
-    Brock fob hp > 80 fcb OpenBall
+    Brock fob healthPoints > 80 fcb OpenBall
         pikapika fob "Excellent health" fcb dot
-    CloseBall Misty fob hp >= 50 fcb OpenBall
+    CloseBall Misty fob healthPoints >= 50 fcb OpenBall
         pikapika fob "Moderate health" fcb dot
     CloseBall Jessie OpenBall
         pikapika fob "Critical health" fcb dot

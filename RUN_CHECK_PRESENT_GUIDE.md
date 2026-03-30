@@ -45,11 +45,18 @@ Then verify syntax + semantic checks:
 .\pokelang_compiler.exe .\comprehensive_test.poke
 ```
 
+Explainability Step Trace mode (token -> reduce -> semantic -> IR):
+
+```powershell
+.\pokelang_compiler.exe .\simple_test.poke --trace
+```
+
 Expected result:
 
 1. Compilation success message
 2. Semantic warnings may appear for implicit conversions (expected and useful)
 3. `intermediate_code.ir` generated
+4. Indentation rule checked: inside `OpenBall ... CloseBall`, statements must be indented (minimum 4 spaces per depth)
 
 ## 5) Run with real execution behavior (Runtime path)
 
@@ -173,8 +180,16 @@ http://127.0.0.1:3001
 How to use:
 
 1. Write PokemonLang code in the editor.
-2. Click `Run Code`.
-3. Output appears in the output panel.
+2. Optional: click `Format Indentation` to auto-apply 4-space block indentation.
+3. Click `Run Code` for runtime output, or `Run with Trace` for explainability flow.
+4. Output appears in the output panel.
+
+Trace output order:
+
+1. `[TRACE][TOKEN]` token stream
+2. `[TRACE][REDUCE]` grammar reductions
+3. `[TRACE][SEM]` semantic actions
+4. `[TRACE][IR]` generated IR lines
 
 Notes:
 

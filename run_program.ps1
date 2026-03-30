@@ -125,5 +125,9 @@ Write-Host "Built executable: $OutputExe"
 
 if ($Run) {
     Write-Host "Running: $OutputExe"
+    Write-Host "----- Program Output Start -----"
     & ".\$OutputExe"
+    $programExitCode = $LASTEXITCODE
+    Write-Host ""
+    Write-Host "----- Program Output End (exit code: $programExitCode) -----"
 }
